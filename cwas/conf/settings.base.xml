@@ -1,0 +1,33 @@
+<settings>
+  <mirrors>
+    <mirror>
+      <id>nexus</id>id>
+      <mirrorOf>central</mirrorOf>mirrorOf>
+      <url>http://nexus.icloudway.com/content/groups/public</url>
+    </mirror>
+  </mirrors>
+  <profiles>
+    <profile>
+      <id>nexus</id>id>
+      <repositories>
+        <repository>
+          <id>nexus</id>
+          <url>http://nexus.icloudway.com/content/groups/public</url>
+          <release><enabled>true</enabled></release>
+          <snapshot><enabled>true</enabled></snapshot>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>nexus</id>id>
+          <url>http://nexus.icloudway.com/content/groups/public</url>
+          <release><enabled>true</enabled></release>
+          <snapshot><enabled>true</enabled></snapshot>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>nexus</activeProfile>
+  </activeProfiles>
+</settings>
