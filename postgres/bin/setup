@@ -1,0 +1,16 @@
+#!/bin/bash -e
+
+dbuser=$(cwctl pwgen admin)
+dbpass=$(cwctl pwgen)
+dbname=$CLOUDWAY_APP_NAME
+
+cwctl setenv --export CLOUDWAY_POSTGRES_DB_USERNAME "$dbuser"
+cwctl setenv --export CLOUDWAY_POSTGRES_DB_PASSWORD "$dbpass"
+
+echo ""
+echo "PostgreSQL database added. Please make note of these credentials:"
+echo ""
+echo "        User Name: $dbuser"
+echo "         Password: $dbpass"
+echo "    Database Name: $dbname"
+echo ""

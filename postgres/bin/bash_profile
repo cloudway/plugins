@@ -1,0 +1,15 @@
+function psql {
+  useropt="-U $CLOUDWAY_POSTGRES_DB_USERNAME"
+  dbopt="-d $CLOUDWAY_APP_NAME"
+
+  # Unset default value if it was provided to us.
+  for arg in $@; do
+    case "$arg" in
+      --username=*|-U)  unset useropt ;;
+      --dbname=*|-d)    unset dbopt ;;
+      *) ;;
+    esac
+  done
+
+  /usr/lib/postgresql/$PG_MAJOR/bin/psql $useropt $dbopt "$@"
+}
