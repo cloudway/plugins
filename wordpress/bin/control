@@ -1,0 +1,96 @@
+#!/bin/bash -eu
+
+export PHPRC="${CLOUDWAY_WORDPRESS_DIR}/etc/php.ini"
+
+HTTPD_CFG_DIR=$CLOUDWAY_WORDPRESS_DIR/etc/apache2
+HTTPD_CFG_FILE=$HTTPD_CFG_DIR/apache2.conf
+HTTPD_PASSENV_FILE=$HTTPD_CFG_DIR/conf-enabled/passenv.conf
+HTTPD_PID_FILE=$CLOUDWAY_WORDPRESS_DIR/run/apache2.pid
+
+export WORDPRESS_DB_NAME=${CLOUDWAY_APP_NAME}
+export WORDPRESS_DB_HOST=${CLOUDWAY_MYSQL_DB_HOST}:${CLOUDWAY_MYSQL_DB_PORT}
+export WORDPRESS_DB_USER=${CLOUDWAY_MYSQL_DB_USERNAME}
+export WORDPRESS_DB_PASSWORD=${CLOUDWAY_MYSQL_DB_PASSWORD}
+
+function apache {
+    /usr/sbin/apache2 -f $HTTPD_CFG_FILE -k $1
+}
+
+function start {
+    ${CLOUDWAY_WORDPRESS_DIR}/bin/config
+    write_httpd_passenv
+    apache start
+    ret=$?
+    [ "$ret" == "0" ] && wait_for_start
+    return $ret
+}
+
+function restart {
+    ${CLOUDWAY_WORDPRESS_DIR}/bin/config
+    write_httpd_passenv
+    apache restart
+    return $?
+}
+
+function reload {
+    ${CLOUDWAY_WORDPRESS_DIR}/bin/config
+    write_httpd_passenv
+    apache graceful
+    return $?
+}
+
+function stop {
+    apache stop
+    ret=$?
+    wait_for_stop
+    return $ret
+}
+
+function tidy {
+    rm -rf $CLOUDWAY_WORDPRESS_LOG_DIR/*
+    return 0
+}
+
+function status {
+    if curl "http://127.0.0.1:$CLOUDWAY_WORDPRESS_PORT/server-status?auto" >/dev/null 2>&1; then
+        echo "WordPress is running"
+    else
+        echo "WordPress is either stopped or inaccessible"
+    fi
+}
+
+function write_httpd_passenv {
+    ( for key in $(env | cut -d= -f1); do
+        if [[ $key =~ ^[A-Z].* ]]; then
+            echo PassEnv $key
+        fi
+      done ) > $HTTPD_PASSENV_FILE
+}
+
+function wait_for_start {
+    [ -f "$HTTPD_PID_FILE" ] && return 0
+    for i in {1..10}; do
+        sleep .5
+        [ -f "$HTTPD_PID_FILE" ] && break
+    done
+}
+
+function wait_for_stop {
+    ! [ -f "$HTTPD_PID_FILE" ] && return 0
+    for i in {1..10}; do
+        sleep .5
+        ! [ -f "$HTTPD_PID_FILE" ] && break
+    done
+}
+
+case "$1" in
+    start)      echo "Starting WordPress";    start ;;
+    stop)       echo "Stopping WordPress";    stop ;;
+    restart)    echo "Restarting WordPress";  restart ;;
+    reload)     echo "Reloading WordPress";   reload ;;
+    status)     status ;;
+    tidy)       tidy ;;
+    *)          exit 0
+esac
+
+exit $?
