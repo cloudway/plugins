@@ -1,0 +1,118 @@
+#!/bin/bash -e
+
+export PHPRC="${CLOUDWAY_JOOMLA_DIR}/etc/php.ini"
+
+HTTPD_CFG_DIR=$CLOUDWAY_JOOMLA_DIR/etc/apache2
+HTTPD_CFG_FILE=$HTTPD_CFG_DIR/apache2.conf
+HTTPD_PASSENV_FILE=$HTTPD_CFG_DIR/conf-enabled/passenv.conf
+HTTPD_PID_FILE=$CLOUDWAY_JOOMLA_DIR/run/apache2.pid
+
+function apache {
+    /usr/sbin/apache2 -f $HTTPD_CFG_FILE -k $1
+}
+
+function start {
+    config_joomla || return 1
+    write_httpd_passenv
+    apache start
+    ret=$?
+    [ "$ret" == "0" ] && wait_for_start
+    return $ret
+}
+
+function restart {
+    config_joomla || return 1
+    write_httpd_passenv
+    apache restart
+    return $?
+}
+
+function reload {
+    config_joomla || return 1
+    write_httpd_passenv
+    apache graceful
+    return $?
+}
+
+function stop {
+    apache stop
+    ret=$?
+    wait_for_stop
+    return $ret
+}
+
+function tidy {
+    rm -rf $CLOUDWAY_JOOMLA_LOG_DIR/*
+    return 0
+}
+
+function status {
+    if curl "http://127.0.0.1:$CLOUDWAY_JOOMLA_PORT/server-status?auto" >/dev/null 2>&1; then
+        echo "Joomla is running"
+    else
+        echo "Joomla is either stopped or inaccessible"
+    fi
+}
+
+function config_joomla {
+    if [ -f ${CLOUDWAY_REPO_DIR}/configuration.php ]; then
+        if [ -n "$CLOUDWAY_MYSQL_DB_HOST" ]; then
+            db_type="mysqli"
+            db_name=${CLOUDWAY_APP_NAME}
+            db_host=${CLOUDWAY_MYSQL_DB_HOST}:${CLOUDWAY_MYSQL_DB_PORT}
+            db_user=${CLOUDWAY_MYSQL_DB_USERNAME}
+            db_pass=${CLOUDWAY_MYSQL_DB_PASSWORD}
+        elif [ -n "$CLOUDWAY_POSTGRES_DB_HOST" ]; then
+            db_type="postgresql"
+            db_name=${CLOUDWAY_APP_NAME}
+            db_host=${CLOUDWAY_POSTGRES_DB_HOST}
+            db_user=${CLOUDWAY_POSTGRES_DB_USERNAME}
+            db_pass=${CLOUDWAY_POSTGRES_DB_PASSWORD}
+        else
+            echo >&2 "No database configured for Joomla"
+            return 1
+        fi
+
+        sed -i ${CLOUDWAY_REPO_DIR}/configuration.php \
+            -e "s/\$host = .*/\$host = '${db_host}';/" \
+            -e "s/\$user = .*/\$user = '${db_user}';/" \
+            -e "s/\$password = .*/\$password = '${db_pass}';/" \
+            -e "s/\$db = .*/\$db = '${db_name}';/"
+    fi
+}
+
+function write_httpd_passenv {
+    ( for key in $(env | cut -d= -f1); do
+        if [[ $key =~ ^[A-Z].* ]]; then
+            echo PassEnv $key
+        fi
+      done ) > $HTTPD_PASSENV_FILE
+}
+
+function wait_for_start {
+    [ -f "$HTTPD_PID_FILE" ] && return 0
+    for i in {1..10}; do
+        sleep .5
+        [ -f "$HTTPD_PID_FILE" ] && break
+    done
+}
+
+function wait_for_stop {
+    ! [ -f "$HTTPD_PID_FILE" ] && return 0
+    for i in {1..10}; do
+        sleep .5
+        ! [ -f "$HTTPD_PID_FILE" ] && break
+    done
+}
+
+case "$1" in
+    start)      echo "Starting Joomla";    start ;;
+    stop)       echo "Stopping Joomla";    stop ;;
+    restart)    echo "Restarting Joomla";  restart ;;
+    reload)     echo "Reloading Joomla";   reload ;;
+    status)     status ;;
+    tidy)       tidy ;;
+    *)          exit 0
+esac
+
+exit $?

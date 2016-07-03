@@ -1,0 +1,16 @@
+---
+Name: joomla
+Display-Name: Joomla 3.5.1
+Description: Joomla! is an open source content management system.
+Version: '3.5.1'
+Vendor: joomla.org
+Category: Framework
+Base-Image: joomla:3.5.1-apache
+Depends-On: [mysql]
+Endpoints:
+- Private-Host-Name: HOST
+  Private-Port-Name: PORT
+  Private-Port: 8080
+  Proxy-Mappings:
+  - Frontend: ''
+    Backend: ''

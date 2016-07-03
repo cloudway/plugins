@@ -1,0 +1,88 @@
+#!/bin/bash -e
+
+cd ${CLOUDWAY_REPO_DIR}
+
+# Copy Joomla files
+if ! [ -e index.php ]; then
+    echo >&2 "Joomla not found in $(pwd) - copying now..."
+    tar cf - --one-file-system -C /usr/src/joomla . | tar xf -
+    echo >&2 "Complete! Joomla has been successfully installed to $(pwd)"
+fi
+
+# Configure database
+if [ -d installation ]; then
+    if [ -n "$CLOUDWAY_MYSQL_DB_HOST" ]; then
+        db_type="mysqli"
+        db_name=${CLOUDWAY_APP_NAME}
+        db_host=${CLOUDWAY_MYSQL_DB_HOST}:${CLOUDWAY_MYSQL_DB_PORT}
+        db_user=${CLOUDWAY_MYSQL_DB_USERNAME}
+        db_pass=${CLOUDWAY_MYSQL_DB_PASSWORD}
+    elif [ -n "$CLOUDWAY_POSTGRES_DB_HOST" ]; then
+        db_type="postgresql"
+        db_name=${CLOUDWAY_APP_NAME}
+        db_host=${CLOUDWAY_POSTGRES_DB_HOST}
+        db_user=${CLOUDWAY_POSTGRES_DB_USERNAME}
+        db_pass=${CLOUDWAY_POSTGRES_DB_PASSWORD}
+    else
+        echo >&2 "No database configured for Joomla"
+        exit 1
+    fi
+
+    cat > installation/model/forms/database.xml <<EODBFORM
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset>
+		<fieldset name="basic">
+			<field name="db_type" type="databaseconnection"
+				id="db_type" class="inputbox"
+				label="INSTL_DATABASE_TYPE_LABEL"
+				supported="mysql,mysqli,pdomysql,postgresql,sqlsrv,sqlazure"
+				required="true"
+				default="$db_type"
+				filter="string"
+			/>
+
+			<field name="db_host" type="text" id="db_host" class="inputbox"
+				label="INSTL_DATABASE_HOST_LABEL"
+				default="$db_host"
+				required="true"
+			/>
+			<field name="db_user" type="text" id="db_user" class="inputbox"
+				label="INSTL_DATABASE_USER_LABEL"
+				default="$db_user"
+				required="true"
+			/>
+			<field name="db_pass" type="password" id="db_pass" class="inputbox"
+				label="INSTL_DATABASE_PASSWORD_LABEL"
+				autocomplete="off"
+				default="$db_pass"
+				filter="raw"
+			/>
+			<field name="db_name" type="text" id="db_name" class="inputbox"
+				label="INSTL_DATABASE_NAME_LABEL"
+				default="$db_name"
+				required="true"
+			/>
+		</fieldset>
+
+		<!-- Advanced Settings -->
+		<fieldset name="advanced">
+			<field name="db_old" type="radio" id="db_old" class="btn-group"
+				label="INSTL_DATABASE_OLD_PROCESS_LABEL"
+				default="backup"
+				required="true"
+			>
+				<option value="backup">INSTL_DATABASE_FIELD_VALUE_BACKUP</option>
+				<option value="remove">INSTL_DATABASE_FIELD_VALUE_REMOVE</option>
+			</field>
+			<field name="db_prefix" type="installation.prefix" id="db_prefix" class="inputbox"
+				label="INSTL_DATABASE_PREFIX_LABEL"
+				required="true"
+				validate="installation.prefix"
+				message="INSTL_DATABASE_PREFIX_MSG"
+			/>
+		</fieldset>
+	</fieldset>
+</form>
+EODBFORM
+fi
