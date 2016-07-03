@@ -1,0 +1,10 @@
+!include /etc/mysql/my.cnf
+
+[mysqld]
+datadir={{.CLOUDWAY_MARIADB_DIR}}/data
+port={{.CLOUDWAY_MARIADB_PORT}}
+socket={{.CLOUDWAY_MARIADB_DIR}}/run/mysql.sock
+
+[mysqld_safe]
+socket={{.CLOUDWAY_MARIADB_DIR}}/run/mysql.sock
+pid-file={{.CLOUDWAY_MARIADB_DIR}}/run/mysql.pid

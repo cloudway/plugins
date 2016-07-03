@@ -1,0 +1,12 @@
+---
+Name: mariadb
+Display-Name: MariaDB 10.1
+Version: '10.1'
+Vendor: mariadb.org
+Logo: manifest/logo.png
+Category: Service
+Base-Image: mariadb:10.1
+Endpoints:
+- Private-Host-Name: HOST
+  Private-Port-Name: PORT
+  Private-Port: 3306

@@ -1,0 +1,23 @@
+#!/bin/bash -eu
+
+mkdir -p $CLOUDWAY_MARIADB_DIR/{data,run}
+
+datadir="$CLOUDWAY_MARIADB_DIR/data"
+socket="$CLOUDWAY_MARIADB_DIR/run/mysql.sock"
+
+username=$(cwctl pwgen admin)
+password=$(cwctl pwgen)
+
+/usr/bin/mysql_install_db --datadir=${datadir} --skip-name-resolve --force > /dev/null
+
+cwctl setenv --export CLOUDWAY_MYSQL_DB_USERNAME "$username"
+cwctl setenv --export CLOUDWAY_MYSQL_DB_PASSWORD "$password"
+cwctl setenv CLOUDWAY_MYSQL_DB_SOCKET "$socket"
+
+echo ""
+echo "MariaDB database added. Please make note of these credentials:"
+echo ""
+echo "        User Name: $username"
+echo "         Password: $password"
+echo "    Database Name: $CLOUDWAY_APP_NAME"
+echo ""
