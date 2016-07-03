@@ -1,10 +1,2 @@
 upload_tmp_dir = "{{.CLOUDWAY_WORDPRESS_DIR}}/tmp/"
 session.save_path = "{{.CLOUDWAY_WORDPRESS_DIR}}/sessions"
-
-opache.memory_consumption=128
-opache.interned_strings_buffer=8
-opache.max_accelerated_files=4000
-opache.revalidate_freq=60
-opache.fast_shutdown=1
-opache.enable_cli=1
-

@@ -6,7 +6,7 @@ Version: '3.5.1'
 Vendor: joomla.org
 Logo: manifest/logo.png
 Category: Framework
-Base-Image: joomla:3.5.1-apache
+Base-Image: icloudway/joomla:3.5
 Depends-On: [mysql]
 Endpoints:
 - Private-Host-Name: HOST

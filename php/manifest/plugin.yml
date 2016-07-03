@@ -7,7 +7,7 @@ Version: '5.6'
 Vendor: php.net
 Logo: manifest/logo.png
 Category: Framework
-Base-Image: php:5.6-apache
+Base-Image: icloudway/php:5.6
 Endpoints:
 - Private-Host-Name: HOST
   Private-Port-Name: PORT

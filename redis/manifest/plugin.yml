@@ -6,7 +6,7 @@ Version: '3.2'
 Vendor: redis.io
 Logo: manifest/logo.png
 Category: Service
-Base-Image: debian:jessie
+Base-Image: icloudway/redis:3.2
 User: root
 Endpoints:
 - Private-Host-Name: HOST
