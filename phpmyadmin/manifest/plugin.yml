@@ -3,6 +3,7 @@ Name: phpmyadmin
 Display-Name: phpMyAdmin 4.6.2
 Version: '4.6.2'
 Vendor: phpmyadmin.net
+Logo: manifest/logo.png
 Category: Service
 Base-Image: nazarpc/phpmyadmin
 Depends-On: [mysql]

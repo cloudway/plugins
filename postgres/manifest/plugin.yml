@@ -3,6 +3,7 @@ Name: postgres
 Display-Name: PostgreSQL 9.5
 Version: '9.5'
 Vendor: postgresql.org
+Logo: manifest/logo.png
 Category: Service
 Base-Image: postgres:9.5.3
 User: root

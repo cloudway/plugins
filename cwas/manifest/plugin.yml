@@ -3,6 +3,7 @@ Name: cwas
 Display-Name: Cloudway Web Application Server 1.1
 Version: '1.1'
 Vendor: cloudway
+Logo: manifest/logo.png
 Category: Framework
 Base-Image: icloudway/cwas:1.1
 Endpoints:

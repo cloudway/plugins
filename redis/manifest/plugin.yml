@@ -4,6 +4,7 @@ Display-Name: Redis 3.2
 Description: Redis is an open source key-value store that functions as a data structure server.
 Version: '3.2'
 Vendor: redis.io
+Logo: manifest/logo.png
 Category: Service
 Base-Image: debian:jessie
 User: root

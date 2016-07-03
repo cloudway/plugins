@@ -3,6 +3,7 @@ Name: mysql
 Display-Name: MySQL 5.5
 Version: '5.5'
 Vendor: Oracle
+Logo: manifest/logo.png
 Category: Service
 Base-Image: mysql:5.5
 Endpoints:

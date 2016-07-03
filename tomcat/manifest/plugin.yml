@@ -4,6 +4,7 @@ Display-Name: Apache Tomcat 8.0.35
 Description: Apache Tomcat is an open source implementation of the Java Servlet and JavaServer Pages technologies
 Version: '8.0'
 Vendor: Apache
+Logo: manifest/logo.png
 Category: Framework
 Base-Image: icloudway/tomcat:8.0
 Endpoints:

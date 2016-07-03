@@ -4,6 +4,7 @@ Display-Name: WordPress 4.5.3
 Description: The WordPress rich content management system can utilize plugins, widgets, and themes.
 Version: '4.5.3'
 Vendor: wordpress.org
+Logo: manifest/logo.png
 Category: Framework
 Base-Image: wordpress:4.5.3-apache
 Depends-On: [mysql]
