@@ -1,0 +1,25 @@
+#!/bin/bash
+
+postconf -e myhostname=${CLOUDWAY_APP_DNS}
+postconf -F '*/*/chroot = n'
+
+postconf -e smtpd_sasl_auth_enable=yes
+postconf -e broken_sasl_auth_clients=yes
+postconf -e smtpd_recipient_restrictions=permit_sasl_authenticated,reject_unauth_destination
+postconf -e smtpd_use_tls=no
+
+username=postmaster
+password=$(cwctl pwgen)
+
+echo $password | saslpasswd2 -p -c -u ${CLOUDWAY_APP_DNS} $username
+chown postfix.sasl /etc/sasldb2
+
+cwctl setenv --export CLOUDWAY_SMTP_USERNAME $username
+cwctl setenv --export CLOUDWAY_SMTP_PASSWORD $password
+
+echo ""
+echo "Postfix mailer added. Please make note of these credentials:"
+echo ""
+echo "        User Name: $username"
+echo "         Password: $password"
+echo ""

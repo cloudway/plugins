@@ -69,15 +69,27 @@ function config_joomla {
             db_user=${CLOUDWAY_POSTGRES_DB_USERNAME}
             db_pass=${CLOUDWAY_POSTGRES_DB_PASSWORD}
         else
-            echo >&2 "No database configured for Joomla"
-            return 1
+            echo >&2 "Warning: no database configured for Joomla"
         fi
 
-        sed -i ${CLOUDWAY_REPO_DIR}/configuration.php \
-            -e "s/\$host = .*/\$host = '${db_host}';/" \
-            -e "s/\$user = .*/\$user = '${db_user}';/" \
-            -e "s/\$password = .*/\$password = '${db_pass}';/" \
-            -e "s/\$db = .*/\$db = '${db_name}';/"
+        if [ -n "$db_type" ]; then
+            sed -i ${CLOUDWAY_REPO_DIR}/configuration.php \
+                -e "s/\$dbtype = .*/\$dbtype = '${db_type}';/" \
+                -e "s/\$host = .*/\$host = '${db_host}';/" \
+                -e "s/\$user = .*/\$user = '${db_user}';/" \
+                -e "s/\$password = .*/\$password = '${db_pass}';/" \
+                -e "s/\$db = .*/\$db = '${db_name}';/"
+        fi
+
+        if [ -n "$CLOUDWAY_SMTP_HOST" ]; then
+            sed -i ${CLOUDWAY_REPO_DIR}/configuration.php \
+                -e "s/\$mailer = .*/\$mailer = 'smtp';/" \
+                -e "s/\$smtphost = .*/\$smtphost = '${CLOUDWAY_SMTP_HOST}';/" \
+                -e "s/\$smtpport = .*/\$smtpport = '${CLOUDWAY_SMTP_PORT}';/" \
+                -e "s/\$smtpuser = .*/\$smtpuser = '${CLOUDWAY_SMTP_USERNAME}';/" \
+                -e "s/\$smtppass = .*/\$smtppass = '${CLOUDWAY_SMTP_PASSWORD}';/" \
+                -e "s/\$smtpauth = .*/\$smtpauth = '1';/"
+        fi
     fi
 }
 

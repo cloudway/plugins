@@ -1,0 +1,13 @@
+---
+Name: postfix
+Display-Name: Postfix 2.11
+Version: '2.11'
+Vendor: postfix.org
+Logo: manifest/logo.gif
+Category: Service
+Base-Image: catatnight/postfix
+User: root
+Endpoints:
+- Private-Host-Name: HOST
+  Private-Port-Name: PORT
+  Private-Port: 25

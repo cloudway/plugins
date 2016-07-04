@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+function start {
+    if ! $(pgrep -x rsyslogd > /dev/null 2>&1); then
+        /usr/sbin/rsyslogd
+    fi
+    /usr/sbin/postfix start
+}
+
+function stop {
+    /usr/sbin/postfix stop
+}
+
+function reload {
+    /usr/sbin/postfix reload
+}
+
+case "$1" in
+  start)    echo "Starting Postfix";   start ;;
+  stop)     echo "Stopping Postfix";   stop ;;
+  restart)  echo "Restarting Postfix"; stop && start ;;
+  reload)   echo "Reloading Postfix";  reload ;;
+  status)   /usr/sbin/postfix status ;;
+  *)        exit 0
+esac
+
+exit $?
