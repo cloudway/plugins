@@ -1,6 +1,13 @@
 #!/bin/bash -eu
 
-HTTPD_PID_FILE=/var/run/apache2/apache2.pid
+export APACHE_RUN_USER=www-data
+export APACHE_RUN_GROUP=www-data
+export APACHE_LOG_DIR=${CLOUDWAY_PHPMYADMIN_LOG_DIR}
+export APACHE_LOCK_DIR=${CLOUDWAY_PHPMYADMIN_DIR}/lock
+export APACHE_PID_FILE=/var/run/apache2/apache2.pid
+
+mkdir -p $APACHE_LOCK_DIR
+chown ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} $APACHE_LOG_DIR $APACHE_LOCK_DIR
 
 function apache {
     /usr/sbin/apache2 -k $1
@@ -31,18 +38,18 @@ function stop {
 }
 
 function wait_for_start {
-    [ -f "$HTTPD_PID_FILE" ] && return 0
+    [ -f "$APACHE_PID_FILE" ] && return 0
     for i in {1..10}; do
         sleep .5
-        [ -f "$HTTPD_PID_FILE" ] && break
+        [ -f "$APACHE_PID_FILE" ] && break
     done
 }
 
 function wait_for_stop {
-    ! [ -f "$HTTPD_PID_FILE" ] && return 0
+    ! [ -f "$APACHE_PID_FILE" ] && return 0
     for i in {1..10}; do
         sleep .5
-        ! [ -f "$HTTPD_PID_FILE" ] && break
+        ! [ -f "$APACHE_PID_FILE" ] && break
     done
 }
 
