@@ -1,28 +1,28 @@
 <settings>
   <mirrors>
     <mirror>
-      <id>nexus</id>id>
-      <mirrorOf>central</mirrorOf>mirrorOf>
+      <id>nexus</id>
+      <mirrorOf>central</mirrorOf>
       <url>http://nexus.icloudway.com/content/groups/public</url>
     </mirror>
   </mirrors>
   <profiles>
     <profile>
-      <id>nexus</id>id>
+      <id>nexus</id>
       <repositories>
         <repository>
           <id>nexus</id>
           <url>http://nexus.icloudway.com/content/groups/public</url>
-          <release><enabled>true</enabled></release>
-          <snapshot><enabled>true</enabled></snapshot>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
         </repository>
       </repositories>
       <pluginRepositories>
         <pluginRepository>
-          <id>nexus</id>id>
+          <id>nexus</id>
           <url>http://nexus.icloudway.com/content/groups/public</url>
-          <release><enabled>true</enabled></release>
-          <snapshot><enabled>true</enabled></snapshot>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
         </pluginRepository>
       </pluginRepositories>
     </profile>
