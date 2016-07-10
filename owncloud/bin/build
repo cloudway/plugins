@@ -1,0 +1,10 @@
+#!/bin/bash -e
+
+cd ${CLOUDWAY_REPO_DIR}
+
+# Copy ownCloud files
+if [ ! -e version.php ]; then
+    echo >&2 "ownCloud not found in $(pwd) - copying now..."
+    tar cf - --one-file-system -C /usr/src/owncloud . | tar xf -
+    echo >&2 "Complete! ownCloud has been successfully copied to $(pwd)"
+fi

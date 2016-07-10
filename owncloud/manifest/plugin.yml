@@ -1,0 +1,16 @@
+---
+Name: owncloud
+Display-Name: ownCloud 9.0
+Description: ownCloud is a self-hosted file sync and share server.
+Version: '9.0'
+Vendor: owncloud.org
+Logo: manifest/logo.png
+Category: Framework
+Base-Image: owncloud:9.0-apache
+Endpoints:
+- Private-Host-Name: HOST
+  Private-Port-Name: PORT
+  Private-Port: 8080
+  Proxy-Mappings:
+  - Frontend: ''
+    Backend: ''

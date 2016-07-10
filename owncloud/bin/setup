@@ -1,0 +1,12 @@
+#!/bin/bash -eu
+
+# Create additional directories required by Apache
+mkdir -p $CLOUDWAY_OWNCLOUD_DIR/{env,run,lock,tmp,sessions}
+
+# Clone default Apache configurations
+rm -f $CLOUDWAY_OWNCLOUD_DIR/etc/apache2/{mods-available,mods-enabled,conf-available,conf-enabled,magic}
+ln -s /etc/apache2/mods-available $CLOUDWAY_OWNCLOUD_DIR/etc/apache2/mods-available
+ln -s /etc/apache2/conf-available $CLOUDWAY_OWNCLOUD_DIR/etc/apache2/conf-available
+ln -s /etc/apache2/magic $CLOUDWAY_OWNCLOUD_DIR/etc/apache2/magic
+cp -R /etc/apache2/mods-enabled $CLOUDWAY_OWNCLOUD_DIR/etc/apache2/
+mkdir -p $CLOUDWAY_OWNCLOUD_DIR/etc/apache2/conf-enabled
