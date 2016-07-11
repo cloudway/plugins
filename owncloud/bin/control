@@ -12,6 +12,7 @@ function apache {
 }
 
 function start {
+    configure
     write_httpd_passenv
     apache start
     ret=$?
@@ -20,12 +21,14 @@ function start {
 }
 
 function restart {
+    configure
     write_httpd_passenv
     apache restart
     return $?
 }
 
 function reload {
+    configure
     write_httpd_passenv
     apache graceful
     return $?
@@ -48,6 +51,25 @@ function status {
         echo "ownCloud is running"
     else
         echo "ownCloud is either stopped or inaccessible"
+    fi
+}
+
+function configure {
+    if [ -f ${CLOUDWAY_REPO_DIR}/config/config.php ]; then
+        oc_dbtype=$(grep dbtype ${CLOUDWAY_REPO_DIR}/config/config.php | sed "s/.*'dbtype' => '\\(.*\\)'.*/\\1/")
+
+        if [ -n "$CLOUDWAY_POSTGRES_DB_HOST" ]; then
+            dbtype="pgsql"
+            dbhost=${CLOUDWAY_POSTGRES_DB_HOST}:${CLOUDWAY_POSTGRES_DB_PORT}
+        elif [ -n "$CLOUDWAY_MYSQL_DB_HOST" ]; then
+            dbtype="mysql"
+            dbhost=${CLOUDWAY_MYSQL_DB_HOST}:${CLOUDWAY_MYSQL_DB_PORT}
+        fi
+
+        if [ "$oc_dbtype" == "$dbtype" ]; then
+            sed -i ${CLOUDWAY_REPO_DIR}/config/config.php \
+                -e "s/'dbhost' => .*/'dbhost' => '$dbhost',/"
+        fi
     fi
 }
 

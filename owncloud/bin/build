@@ -8,3 +8,34 @@ if [ ! -e version.php ]; then
     tar cf - --one-file-system -C /usr/src/owncloud . | tar xf -
     echo >&2 "Complete! ownCloud has been successfully copied to $(pwd)"
 fi
+
+if [ ! -f config/autoconfig.php ]; then
+    if [ -n "$CLOUDWAY_POSTGRES_DB_HOST" ]; then
+        dbtype="pgsql"
+        dbname=$CLOUDWAY_APP_NAME
+        dbhost=${CLOUDWAY_POSTGRES_DB_HOST}:${CLOUDWAY_POSTGRES_DB_PORT}
+        dbuser=$CLOUDWAY_POSTGRES_DB_USERNAME
+        dbpass=$CLOUDWAY_POSTGRES_DB_PASSWORD
+    elif [ -n "$CLOUDWAY_MYSQL_DB_HOST" ]; then
+        dbtype="mysql"
+        dbname=$CLOUDWAY_APP_NAME
+        dbhost=${CLOUDWAY_MYSQL_DB_HOST}:${CLOUDWAY_MYSQL_DB_PORT}
+        dbuser=$CLOUDWAY_MYSQL_DB_USERNAME
+        dbpass=$CLOUDWAY_MYSQL_DB_PASSWORD
+    else
+        dbtype="sqlite"
+        dbname=$CLOUDWAY_APP_NAME
+    fi
+
+    cat > config/autoconfig.php <<EOPHP
+<?php
+\$AUTOCONFIG = array(
+  'directory' => '$CLOUDWAY_DATA_DIR/owncloud',
+  'dbtype' => '$dbtype',
+  'dbname' => '$dbname',
+  'dbhost' => '$dbhost',
+  'dbuser' => '$dbuser',
+  'dbpass' => '$dbpass',
+);
+EOPHP
+fi
