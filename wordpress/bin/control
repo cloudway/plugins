@@ -116,7 +116,7 @@ function configure {
             # if not specified, let's generate a random value
             current_set="$(sed -rn "s/define\((([\'\"])$unique\2\s*,\s*)(['\"])(.*)\3\);/\4/p" wp-config.php)"
             if [ "$current_set" = 'put your unique phrase here' ]; then
-                set_config "$unique" "$(head -c1M /dev/urandom | sha1sum | cut -d' ' -f1)"
+                set_config "$unique" "$(echo "$unique:$CLOUDWAY_SHARED_SECRET" | sha1sum | cut -d' ' -f1)"
             fi
         fi
     done
