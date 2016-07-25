@@ -1,0 +1,15 @@
+---
+Name: scratch
+Display-Name: Scratch 1.0
+Description: Run arbitrary application from scratch.
+Version: '1.0'
+Vendor: cloudway
+Category: Framework
+Base-Image: icloudway/scratch:1.0
+Endpoints:
+- Private-Host-Name: HOST
+  Private-Port-Name: PORT
+  Private-Port: 8080
+  Proxy-Mappings:
+  - Frontend: ''
+    Backend: ''

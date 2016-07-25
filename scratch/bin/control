@@ -1,0 +1,39 @@
+#!/bin/bash
+set -e
+
+CONF=${CLOUDWAY_SCRATCH_DIR}/etc/supervisor.conf
+
+function start() {
+    echo "Starting supervisor"
+    if ! $(pgrep -x supervisord > /dev/null 2>&1); then
+        /usr/bin/supervisord -c $CONF
+    fi
+}
+
+function stop() {
+    echo "Shutdown supervisor"
+    if $(pgrep -x supervisord > /dev/null 2>&1); then
+        /usr/bin/supervisorctl -c $CONF shutdown
+    fi
+}
+
+function restart() {
+    /usr/bin/supervisorctl -c $CONF restart all
+}
+
+function reload() {
+    /usr/bin/supervisorctl -c $CONF reload
+}
+
+function status() {
+    /usr/bin/supervisorctl -c $CONF status
+}
+
+case "$1" in
+  start)    start ;;
+  stop)     stop ;;
+  restart)  restart ;;
+  reload)   reload ;;
+  status)   status ;;
+  *)        exit 0
+esac

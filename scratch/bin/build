@@ -1,0 +1,5 @@
+#!/bin/bash -eu
+
+if [ -x $CLOUDWAY_REPO_DIR/bin/build ]; then
+    $CLOUDWAY_REPO_DIR/bin/build
+fi

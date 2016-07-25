@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+exec $CLOUDWAY_REPO_DIR/bin/goserv

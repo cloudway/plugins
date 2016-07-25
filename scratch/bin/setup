@@ -1,0 +1,3 @@
+#!/bin/bash -eu
+
+mkdir -p $CLOUDWAY_SCRATCH_DIR/run

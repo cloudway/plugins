@@ -1,0 +1,4 @@
+#!/bin/bash -e
+
+export GOPATH=$CLOUDWAY_REPO_DIR
+go install goserv
