@@ -1,0 +1,23 @@
+[unix_http_server]
+file={{.CLOUDWAY_NODEJS_DIR}}/run/supervisord.sock
+chmod=0700
+
+[supervisord]
+logfile={{.CLOUDWAY_NODEJS_LOG_DIR}}/supervisord.log
+pidfile={{.CLOUDWAY_NODEJS_DIR}}/run/supervisord.pid
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[supervisorctl]
+serverurl=unix://{{.CLOUDWAY_NODEJS_DIR}}/run/supervisord.sock
+
+[include]
+files={{.CLOUDWAY_REPO_DIR}}/etc/supervisor.conf
+
+[program:nodejs]
+command=npm start
+directory={{.CLOUDWAY_REPO_DIR}}
+stdout_logfile=%(ENV_CLOUDWAY_NODEJS_LOG_DIR)s/%(program_name)s.log
+stderr_logfile=%(ENV_CLOUDWAY_NODEJS_LOG_DIR)s/%(program_name)s.log
+autorestart=true

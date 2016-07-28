@@ -1,17 +1,17 @@
 #!/bin/bash
 set -e
 
-SUPERVISOR_CONF=${CLOUDWAY_SCRATCH_DIR}/etc/supervisor.conf
+SUPERVISOR_CONF=${CLOUDWAY_NODEJS_DIR}/etc/supervisor.conf
 
 function start() {
-    echo "Starting supervisor"
+    echo "Starting Node.js"
     if ! $(pgrep -x supervisord > /dev/null 2>&1); then
         supervisord -c $SUPERVISOR_CONF
     fi
 }
 
 function stop() {
-    echo "Shutdown supervisor"
+    echo "Stopping Node.js"
     if $(pgrep -x supervisord > /dev/null 2>&1); then
         supervisorctl -c $SUPERVISOR_CONF stop all
         supervisorctl -c $SUPERVISOR_CONF shutdown

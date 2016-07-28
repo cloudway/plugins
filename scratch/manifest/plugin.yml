@@ -4,6 +4,7 @@ Display-Name: Scratch 1.0
 Description: Run arbitrary application from scratch.
 Version: '1.0'
 Vendor: cloudway
+Logo: manifest/logo.png
 Category: Framework
 Base-Image: icloudway/scratch:1.0
 Endpoints:

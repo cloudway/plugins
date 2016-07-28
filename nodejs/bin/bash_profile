@@ -1,0 +1,1 @@
+alias supervisorctl='/usr/bin/supervisorctl -c $CLOUDWAY_NODEJS_DIR/etc/supervisor.conf'

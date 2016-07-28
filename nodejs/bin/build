@@ -1,0 +1,6 @@
+#!/bin/bash -e
+
+registry="https://registry.npm.taobao.org"
+
+cd $CLOUDWAY_REPO_DIR
+npm --registry $registry install

@@ -1,0 +1,16 @@
+---
+Name: nodejs
+Display-Name: Node.js 6.3
+Description: Node.js is a JavaScript-based platform for server-side and networking applications.
+Version: '6.3'
+Vendor: www.nodejs.org
+Logo: manifest/logo.png
+Category: Framework
+Base-Image: icloudway/nodejs:6.3
+Endpoints:
+- Private-Host-Name: HOST
+  Private-Port-Name: PORT
+  Private-Port: 8080
+  Proxy-Mappings:
+  - Frontend: ''
+    Backend: ''
