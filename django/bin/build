@@ -1,0 +1,34 @@
+#!/bin/bash -e
+
+source $CLOUDWAY_DJANGO_DIR/bin/dbenv
+
+# Create virtualenv
+VIRTUAL_ENV=$CLOUDWAY_DJANGO_DIR/virtenv
+if [ ! -f $VIRTUAL_ENV/bin/python ]; then
+    echo "Recreating virtual env"
+    virtualenv --quiet --never-download --system-site-packages $VIRTUAL_ENV
+    virtualenv --quiet --never-download --relocatable $VIRTUAL_ENV
+fi
+source $VIRTUAL_ENV/bin/activate
+
+# Install required python packages
+if [ -f $CLOUDWAY_REPO_DIR/requirements.txt ]; then
+    ( cd $CLOUDWAY_REPO_DIR; pip install -r $CLOUDWAY_REPO_DIR/requirements.txt )
+    virtualenv --quiet --never-download --relocatable $VIRTUAL_ENV
+fi
+
+# Initialize Django project
+python ${CLOUDWAY_REPO_DIR}/manage.py collectstatic --noinput
+python ${CLOUDWAY_REPO_DIR}/manage.py makemigrations
+python ${CLOUDWAY_REPO_DIR}/manage.py migrate --noinput
+
+# Create a Django superuser if it doesn't yet exist
+cat <<EOF | python ${CLOUDWAY_REPO_DIR}/manage.py shell
+from django.contrib.auth.models import User
+if User.objects.filter(username='${CLOUDWAY_DJANGO_USERNAME}'):
+    print ("Superuser already exists")
+else:
+    print ("Creating Django superuser named '${CLOUDWAY_DJANGO_USERNAME}'")
+    User.objects.create_superuser('${CLOUDWAY_DJANGO_USERNAME}', 'admin@example.com', '${CLOUDWAY_DJANGO_PASSWORD}')
+
+EOF

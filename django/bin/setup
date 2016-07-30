@@ -1,0 +1,16 @@
+#!/bin/bash -eu
+
+mkdir -p $CLOUDWAY_DJANGO_DIR/{run,nginx}
+
+username=admin
+password=$(cwctl pwgen)
+
+cwctl setenv --export CLOUDWAY_DJANGO_USERNAME "$username"
+cwctl setenv --export CLOUDWAY_DJANGO_PASSWORD "$password"
+
+echo ""
+echo "Django added. Please make note of these credentials:"
+echo ""
+echo "    User Name: $username"
+echo "     Password: $password"
+echo ""

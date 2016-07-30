@@ -1,0 +1,16 @@
+---
+Name: django
+Display-Name: Django 1.9.8
+Description: Django is a free web application framework, written in Python.
+Version: '1.9.8'
+Vendor: djangoproject.com
+Logo: manifest/logo.png
+Category: Framework
+Base-Image: icloudway/django:1.9.8
+Endpoints:
+- Private-Host-Name: HOST
+  Private-Port-Name: PORT
+  Private-Port: 8080
+  Proxy-Mappings:
+  - Frontend: ''
+    Backend: ''

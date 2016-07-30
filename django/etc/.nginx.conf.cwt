@@ -1,0 +1,55 @@
+worker_processes 4;
+pid {{.CLOUDWAY_DJANGO_DIR}}/run/nginx.pid;
+error_log {{.CLOUDWAY_DJANGO_LOG_DIR}}/nginx.log;
+
+events {
+    worker_connections 768;
+}
+
+http {
+    client_body_temp_path {{.CLOUDWAY_DJANGO_DIR}}/nginx/body;
+    fastcgi_temp_path {{.CLOUDWAY_DJANGO_DIR}}/nginx/fastcgi;
+    proxy_temp_path {{.CLOUDWAY_DJANGO_DIR}}/nginx/proxy;
+    scgi_temp_path {{.CLOUDWAY_DJANGO_DIR}}/nginx/scgi;
+    uwsgi_temp_path {{.CLOUDWAY_DJANGO_DIR}}/nginx/uwsgi;
+
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    types_hash_max_size 2048;
+
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+    index index.html;
+
+    error_log {{.CLOUDWAY_DJANGO_LOG_DIR}}/nginx.error.log;
+    access_log {{.CLOUDWAY_DJANGO_LOG_DIR}}/nginx.access.log;
+
+    gzip on;
+    gzip_disable "msie6";
+
+    upstream django_gunicorn {
+        server unix:{{.CLOUDWAY_DJANGO_DIR}}/run/gunicorn.sock;
+    }
+
+    server {
+        listen {{.CLOUDWAY_DJANGO_PORT}} default_server;
+
+        location /static/ {
+            alias {{.CLOUDWAY_DATA_DIR}}/static/;
+        }
+
+        location /media/ {
+            alias {{.CLOUDWAY_DATA_DIR}}/media/;
+        }
+
+        location / {
+            proxy_pass_header Server;
+            proxy_set_header Host $http_host;
+            proxy_redirect off;
+            proxy_connect_timeout 10;
+            proxy_read_timeout 10;
+            proxy_pass http://django_gunicorn;
+        }
+    }
+}
