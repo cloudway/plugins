@@ -1,34 +1,24 @@
 #!/bin/bash
 set -e
 
-source $CLOUDWAY_DJANGO_DIR/bin/dbenv
 source $VIRTUAL_ENV/bin/activate
 
-SUPERVISOR_CONF=${CLOUDWAY_DJANGO_DIR}/etc/supervisor.conf
+SUPERVISOR_CONF=${CLOUDWAY_PYTHON_DIR}/etc/supervisor.conf
 
-# Find the WSGI entrypoint in the project that is used by gunicorn.
 if [ -z "$PYTHON_WSGI_APPLICATION" ]; then
-    for d in $CLOUDWAY_REPO_DIR/*; do
-        if [ -f $d/wsgi.py ]; then
-            export PYTHON_WSGI_APPLICATION="$(basename $d).wsgi"
-            break
-        fi
-    done
-    if [ -z "$PYTHON_WSGI_APPLICATION" ]; then
-        echo "Failed to deploy, no WSGI entrypoint found." >&2
-        exit 2
-    fi
+    echo "Failed to deploy, no WSGI entrypoint found." >&2
+    exit 2
 fi
 
 function start() {
-    echo "Starting Django"
+    echo "Start Python"
     if ! $(pgrep -x supervisord > /dev/null 2>&1); then
         supervisord -c $SUPERVISOR_CONF
     fi
 }
 
 function stop() {
-    echo "Stopping Django"
+    echo "Stop Python"
     if $(pgrep -x supervisord > /dev/null 2>&1); then
         supervisorctl -c $SUPERVISOR_CONF stop all
         supervisorctl -c $SUPERVISOR_CONF shutdown

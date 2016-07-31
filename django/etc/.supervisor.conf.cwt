@@ -25,9 +25,9 @@ priority=10
 
 [program:gunicorn]
 directory={{.CLOUDWAY_REPO_DIR}}
-command=%(ENV_VIRTUAL_ENV)s/bin/python /usr/local/bin/gunicorn -b unix:{{.CLOUDWAY_DJANGO_DIR}}/run/gunicorn.sock -w 4 %(ENV_DJANGO_WSGI)s --log-file={{.CLOUDWAY_DJANGO_LOG_DIR}}/gunicorn.log
-#stdout_logfile=%(ENV_CLOUDWAY_DJANGO_LOG_DIR)s/%(program_name)s.log
-#redirect_stderr=true
+command=%(ENV_VIRTUAL_ENV)s/bin/python /usr/local/bin/gunicorn -b unix:{{.CLOUDWAY_DJANGO_DIR}}/run/gunicorn.sock -w 4 --log-file=- %(ENV_PYTHON_WSGI_APPLICATION)s
+stdout_logfile=%(ENV_CLOUDWAY_DJANGO_LOG_DIR)s/%(program_name)s.log
+redirect_stderr=true
 autostart=true
 autorestart=true
 priority=20

@@ -1,0 +1,16 @@
+#!/bin/bash -e
+
+# Create virtualenv
+VIRTUAL_ENV=$CLOUDWAY_PYTHON_DIR/virtenv
+if [ ! -f $VIRTUAL_ENV/bin/python ]; then
+    echo "Recreating virtual env"
+    virtualenv --quiet --never-download --system-site-packages $VIRTUAL_ENV
+    virtualenv --quiet --never-download --relocatable $VIRTUAL_ENV
+fi
+source $VIRTUAL_ENV/bin/activate
+
+# Install required python packages
+if [ -f $CLOUDWAY_REPO_DIR/requirements.txt ]; then
+    ( cd $CLOUDWAY_REPO_DIR; pip install -r $CLOUDWAY_REPO_DIR/requirements.txt )
+    virtualenv --quiet --never-download --relocatable $VIRTUAL_ENV
+fi

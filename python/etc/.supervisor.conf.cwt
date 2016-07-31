@@ -1,0 +1,33 @@
+[unix_http_server]
+file={{.CLOUDWAY_PYTHON_DIR}}/run/supervisord.sock
+chmod=0700
+
+[supervisord]
+logfile={{.CLOUDWAY_PYTHON_LOG_DIR}}/supervisord.log
+pidfile={{.CLOUDWAY_PYTHON_DIR}}/run/supervisord.pid
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[supervisorctl]
+serverurl=unix://{{.CLOUDWAY_PYTHON_DIR}}/run/supervisord.sock
+
+[include]
+files={{.CLOUDWAY_REPO_DIR}}/etc/supervisor.conf
+
+[program:nginx]
+command=/usr/sbin/nginx -g "daemon off;" -c %(ENV_CLOUDWAY_PYTHON_DIR)s/etc/nginx.conf
+stdout_logfile=%(ENV_CLOUDWAY_PYTHON_LOG_DIR)s/%(program_name)s.log
+redirect_stderr=true
+autostart=true
+autorestart=true
+priority=10
+
+[program:gunicorn]
+directory={{.CLOUDWAY_REPO_DIR}}
+command=%(ENV_VIRTUAL_ENV)s/bin/python /usr/local/bin/gunicorn -b unix:{{.CLOUDWAY_PYTHON_DIR}}/run/gunicorn.sock -w 4 --log-file=- %(ENV_PYTHON_WSGI_APPLICATION)s
+stdout_logfile=%(ENV_CLOUDWAY_PYTHON_LOG_DIR)s/%(program_name)s.log
+redirect_stderr=true
+autostart=true
+autorestart=true
+priority=20

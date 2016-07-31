@@ -1,0 +1,16 @@
+---
+Name: python
+Display-Name: Python 3.4
+Description: Python is an interpreted, interactive, object-oriented, open-source programming language.
+Version: '3.4'
+Vendor: python.org
+Logo: manifest/logo.png
+Category: Framework
+Base-Image: icloudway/python:3.4
+Endpoints:
+- Private-Host-Name: HOST
+  Private-Port-Name: PORT
+  Private-Port: 8080
+  Proxy-Mappings:
+  - Frontend: ''
+    Backend: ''

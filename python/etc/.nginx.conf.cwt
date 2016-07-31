@@ -1,0 +1,46 @@
+worker_processes 4;
+pid {{.CLOUDWAY_PYTHON_DIR}}/run/nginx.pid;
+error_log {{.CLOUDWAY_PYTHON_LOG_DIR}}/nginx.log;
+
+events {
+    worker_connections 768;
+}
+
+http {
+    client_body_temp_path {{.CLOUDWAY_PYTHON_DIR}}/nginx/body;
+    fastcgi_temp_path {{.CLOUDWAY_PYTHON_DIR}}/nginx/fastcgi;
+    proxy_temp_path {{.CLOUDWAY_PYTHON_DIR}}/nginx/proxy;
+    scgi_temp_path {{.CLOUDWAY_PYTHON_DIR}}/nginx/scgi;
+    uwsgi_temp_path {{.CLOUDWAY_PYTHON_DIR}}/nginx/uwsgi;
+
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    types_hash_max_size 2048;
+
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    error_log {{.CLOUDWAY_PYTHON_LOG_DIR}}/nginx.error.log;
+    access_log {{.CLOUDWAY_PYTHON_LOG_DIR}}/nginx.access.log;
+
+    gzip on;
+    gzip_disable "msie6";
+
+    upstream python_wsgi {
+        server unix:{{.CLOUDWAY_PYTHON_DIR}}/run/gunicorn.sock;
+    }
+
+    server {
+        listen {{.CLOUDWAY_PYTHON_PORT}} default_server;
+
+        location / {
+            proxy_pass_header Server;
+            proxy_set_header Host $http_host;
+            proxy_redirect off;
+            proxy_connect_timeout 10;
+            proxy_read_timeout 10;
+            proxy_pass http://python_wsgi;
+        }
+    }
+}

@@ -1,0 +1,3 @@
+#!/bin/bash -eu
+
+mkdir -p $CLOUDWAY_PYTHON_DIR/{run,nginx}
