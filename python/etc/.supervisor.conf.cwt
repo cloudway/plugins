@@ -23,9 +23,9 @@ autostart=true
 autorestart=true
 priority=10
 
-[program:gunicorn]
-directory={{.CLOUDWAY_REPO_DIR}}
-command=%(ENV_VIRTUAL_ENV)s/bin/python /usr/local/bin/gunicorn -b unix:{{.CLOUDWAY_PYTHON_DIR}}/run/gunicorn.sock -w 4 --log-file=- %(ENV_PYTHON_WSGI_APPLICATION)s
+[program:uwsgi]
+directory=%(ENV_CLOUDWAY_REPO_DIR)s
+command=uwsgi --ini %(ENV_CLOUDWAY_REPO_DIR)s/etc/uwsgi.ini
 stdout_logfile=%(ENV_CLOUDWAY_PYTHON_LOG_DIR)s/%(program_name)s.log
 redirect_stderr=true
 autostart=true

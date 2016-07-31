@@ -6,7 +6,7 @@ source $VIRTUAL_ENV/bin/activate
 
 SUPERVISOR_CONF=${CLOUDWAY_DJANGO_DIR}/etc/supervisor.conf
 
-# Find the WSGI entrypoint in the project that is used by gunicorn.
+# Find the WSGI entrypoint in the project that is used by uwsgi.
 if [ -z "$PYTHON_WSGI_APPLICATION" ]; then
     for d in $CLOUDWAY_REPO_DIR/*; do
         if [ -f $d/wsgi.py ]; then

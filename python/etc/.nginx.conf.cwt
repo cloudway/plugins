@@ -28,19 +28,20 @@ http {
     gzip_disable "msie6";
 
     upstream python_wsgi {
-        server unix:{{.CLOUDWAY_PYTHON_DIR}}/run/gunicorn.sock;
+        server unix:{{.CLOUDWAY_PYTHON_DIR}}/run/uwsgi.sock;
     }
 
     server {
         listen {{.CLOUDWAY_PYTHON_PORT}} default_server;
+        server_name {{.CLOUDWAY_APP_DNS}};
+
+        location /static/ {
+            alias {{.CLOUDWAY_REPO_DIR}}/static/;
+        }
 
         location / {
-            proxy_pass_header Server;
-            proxy_set_header Host $http_host;
-            proxy_redirect off;
-            proxy_connect_timeout 10;
-            proxy_read_timeout 10;
-            proxy_pass http://python_wsgi;
+            uwsgi_pass python_wsgi;
+            include /etc/nginx/uwsgi_params;
         }
     }
 }

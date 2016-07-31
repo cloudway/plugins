@@ -28,12 +28,13 @@ http {
     gzip on;
     gzip_disable "msie6";
 
-    upstream django_gunicorn {
-        server unix:{{.CLOUDWAY_DJANGO_DIR}}/run/gunicorn.sock;
+    upstream django_wsgi {
+        server unix:{{.CLOUDWAY_DJANGO_DIR}}/run/uwsgi.sock;
     }
 
     server {
         listen {{.CLOUDWAY_DJANGO_PORT}} default_server;
+        server_name {{.CLOUDWAY_APP_DNS}};
 
         location /static/ {
             alias {{.CLOUDWAY_DATA_DIR}}/static/;
@@ -44,12 +45,8 @@ http {
         }
 
         location / {
-            proxy_pass_header Server;
-            proxy_set_header Host $http_host;
-            proxy_redirect off;
-            proxy_connect_timeout 10;
-            proxy_read_timeout 10;
-            proxy_pass http://django_gunicorn;
+            uwsgi_pass django_wsgi;
+            include /etc/nginx/uwsgi_params;
         }
     }
 }

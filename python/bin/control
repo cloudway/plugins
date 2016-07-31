@@ -5,11 +5,6 @@ source $VIRTUAL_ENV/bin/activate
 
 SUPERVISOR_CONF=${CLOUDWAY_PYTHON_DIR}/etc/supervisor.conf
 
-if [ -z "$PYTHON_WSGI_APPLICATION" ]; then
-    echo "Failed to deploy, no WSGI entrypoint found." >&2
-    exit 2
-fi
-
 function start() {
     echo "Start Python"
     if ! $(pgrep -x supervisord > /dev/null 2>&1); then
