@@ -2,19 +2,31 @@
 
 source $CLOUDWAY_DJANGO_DIR/bin/dbenv
 
+: ${PYTHON:=python3.4}
+if [[ -f $VIRTUAL_ENV/.py && "$PYTHON" != "$(< $VIRTUAL_ENV/.py)" ]]; then
+    rm -rf $VIRTUAL_ENV
+fi
+
 # Create virtualenv
-VIRTUAL_ENV=$CLOUDWAY_DJANGO_DIR/virtenv
 if [ ! -f $VIRTUAL_ENV/bin/python ]; then
     echo "Recreating virtual env"
-    virtualenv --quiet --never-download --system-site-packages $VIRTUAL_ENV
-    virtualenv --quiet --never-download --relocatable $VIRTUAL_ENV
+    virtualenv --quiet --never-download --python=$PYTHON --system-site-packages $VIRTUAL_ENV
+    virtualenv --quiet --never-download --python=$PYTHON --relocatable $VIRTUAL_ENV
+    echo $PYTHON > $VIRTUAL_ENV/.py
+
+    if [ "${PYTHON:0:7}" == "python2" ]; then
+        ln -sf /usr/local/bin/uwsgi2 $VIRTUAL_ENV/bin/uwsgi
+    else
+        ln -sf /usr/local/bin/uwsgi3 $VIRTUAL_ENV/bin/uwsgi
+    fi
 fi
+
 source $VIRTUAL_ENV/bin/activate
 
 # Install required python packages
 if [ -f $CLOUDWAY_REPO_DIR/requirements.txt ]; then
     ( cd $CLOUDWAY_REPO_DIR; pip install -r $CLOUDWAY_REPO_DIR/requirements.txt )
-    virtualenv --quiet --never-download --relocatable $VIRTUAL_ENV
+    virtualenv --quiet --never-download --python=$PYTHON --relocatable $VIRTUAL_ENV
 fi
 
 # Initialize Django project

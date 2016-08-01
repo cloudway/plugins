@@ -25,7 +25,7 @@ priority=10
 
 [program:uwsgi]
 directory=%(ENV_CLOUDWAY_REPO_DIR)s
-command=uwsgi --ini %(ENV_CLOUDWAY_REPO_DIR)s/etc/uwsgi.ini
+command=%(ENV_VIRTUAL_ENV)s/bin/uwsgi --ini %(ENV_CLOUDWAY_REPO_DIR)s/etc/uwsgi.ini
 stdout_logfile=%(ENV_CLOUDWAY_PYTHON_LOG_DIR)s/%(program_name)s.log
 redirect_stderr=true
 autostart=true
