@@ -1,0 +1,9 @@
+<settings>
+  <mirrors>
+    <mirror>
+      <id>nexus</id>
+      <mirrorOf>central</mirrorOf>
+      <url>http://repo.icloudway.com:6616/repository/maven-public</url>
+    </mirror>
+  </mirrors>
+</settings>

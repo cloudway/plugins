@@ -7,13 +7,17 @@ if [ ! -f pom.xml ]; then
   exit 0
 fi
 
-MAVEN_MIRROR="${CLOUDWAY_TOMCAT_DIR}/conf/settings.base.xml"
+if [ -f ${CLOUDWAY_TOMCAT_DIR}/conf/settings.base.xml ]; then
+    MAVEN_MIRROR="--global-settings ${CLOUDWAY_TOMCAT_DIR}/conf/settings.base.xml"
+elif $(echo $CLOUDWAY_APP_DNS | egrep -qe "\.icloudway\.com"); then
+    MAVEN_MIRROR="--global-settings ${CLOUDWAY_TOMCAT_DIR}/conf/settings.cloudway.xml"
+fi
 
 if [ -z "$MAVEN_ARGS" ]; then
   export MAVEN_ARGS="clean package -Pcloudway -DskipTests"
 fi
 
-MVN_CMD="mvn --global-settings $MAVEN_MIRROR $MAVEN_ARGS"
+MVN_CMD="mvn $MAVEN_MIRROR $MAVEN_ARGS"
 echo "Found pom.xml... attempting to build with '$MVN_CMD'"
 sed -i "s/{APP_NAME}/${CLOUDWAY_APP_NAME}/g" pom.xml
 $MVN_CMD
