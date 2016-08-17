@@ -2,6 +2,14 @@
 
 pidfile=$CLOUDWAY_MARIADB_DIR/run/mysql.pid
 
+function run_sql {
+  echo "$@" | /usr/bin/mysql \
+                -S "$CLOUDWAY_MYSQL_DB_SOCKET" \
+                -u "$CLOUDWAY_MYSQL_DB_USERNAME" \
+                --password="$CLOUDWAY_MYSQL_DB_PASSWORD" \
+                --skip-column-names
+}
+
 function is_running {
   if [ -f $pidfile ]; then
     mysql_pid=$(< $pidfile)
@@ -97,18 +105,107 @@ function status {
   exit 0
 }
 
+function pre_dump {
+  mkdir -p $CLOUDWAY_DATA_DIR/mysql
+
+  echo "$CLOUDWAY_APP_NAME" > $CLOUDWAY_DATA_DIR/mysql/db_name
+  echo "$CLOUDWAY_MYSQL_DB_USERNAME" > $CLOUDWAY_DATA_DIR/mysql/db_user
+
+  {
+    /usr/bin/mysqldump \
+        --extended-insert --quick \
+        -S $CLOUDWAY_MYSQL_DB_SOCKET \
+        -u $CLOUDWAY_MYSQL_DB_USERNAME\
+        --password=$CLOUDWAY_MYSQL_DB_PASSWORD \
+        --all-databases --events --triggers --routines --add-drop-table \
+    | gzip > "$CLOUDWAY_DATA_DIR/mysql/dump.gz"
+  } ||
+  {
+    echo >&2 "Warning: could not dump mysql database."
+    rm -rf "$CLOUDWAY_DATA_DIR/mysql"
+  }
+}
+
+function post_dump {
+  rm -rf "$CLOUDWAY_DATA_DIR/mysql"
+}
+
+function pre_restore {
+  true
+}
+
+function post_restore {
+  if [ -f "$CLOUDWAY_DATA_DIR/mysql/dump.gz" ]; then
+    local db_sock="$CLOUDWAY_MYSQL_DB_SOCKET"
+    local db_name="$CLOUDWAY_APP_NAME"
+    local db_user="$CLOUDWAY_MYSQL_DB_USERNAME"
+    local db_pass="$CLOUDWAY_MYSQL_DB_PASSWORD"
+
+    # Restore stashed variables and get current variables
+    local old_name=$(< $CLOUDWAY_DATA_DIR/mysql/db_name)
+    local old_user=$(< $CLOUDWAY_DATA_DIR/mysql/db_user)
+
+    # Drop and recreate current database
+    run_sql "DROP DATABASE IF EXISTS \`$db_name\`;"
+    run_sql "CREATE DATABASE \`$db_name\`;"
+
+    # Restore the old database verbatim, this will be using the old database name
+    (
+      echo "SET AUTOCOMMIT=0;"
+      echo "SET UNIQUE_CHECKS=0;"
+      echo "SET FOREIGN_KEY_CHECKS=0;"
+      zcat $CLOUDWAY_DATA_DIR/mysql/dump.gz
+      echo "SET FOREIGN_KEY_CHECKS=1;"
+      echo "SET UNIQUE_CHECKS=1;"
+      echo "SET AUTOCOMMIT=1;"
+      echo "COMMIT;"
+    ) | /usr/bin/mysql -S $db_sock -u $db_user --password=$db_pass --skip-column-names
+
+    # Grant permissions to the current user
+    run_sql "GRANT ALL ON *.* TO '$db_user'@'%' IDENTIFIED BY '$db_pass' WITH GRANT OPTION;"
+
+    # Only run the following if the username is different
+    if [ "$old_user" != "$db_user" ]; then
+      for host in $(run_sql "SELECT Host FROM mysql.user WHERE user.user='$old_user'"); do
+        run_sql "DROP USER \`$old_user\`@'$host';"
+      done
+    fi
+
+    # Refresh the privileges
+    run_sql "FLUSH PRIVILEGES;"
+
+    # Only run the following if the database name has changed
+    if [ "$old_name" != "$db_name" ]; then
+      # Dump the old database and restore it into the new database
+      # This approach provides relational consistency and will work with tables, views, triggers, etc
+      /usr/bin/mysqldump -S "$db_sock" -P "$db_port" -u "$db_user" --password="$db_pass" $old_name | \
+      /usr/bin/mysql     -S "$db_sock" -P "$db_port" -u "$db_user" --password="$db_pass" $db_name
+
+      # Drop the old database
+      run_sql "DROP DATABASE \`$old_name\`;"
+    fi
+  fi
+
+  # Cleanup
+  rm -rf "$CLOUDWAY_DATA_DIR/mysql"
+}
+
 function tidy {
   shopt -s dotglob
   rm -rf $CLOUDWAY_MARIADB_LOG_DIR/mysql.log*
 }
 
 case "$1" in
-  start)    start ;;
-  stop)     stop ;;
-  restart)  stop; start ;;
-  status)   status ;;
-  tidy)     tidy ;;
-  *)        exit 0 ;;
+  start)        start ;;
+  stop)         stop ;;
+  restart)      stop; start ;;
+  status)       status ;;
+  pre-dump)     pre_dump ;;
+  post-dump)    post_dump ;;
+  pre-restore)  pre_restore ;;
+  post-restore) post_restore ;;
+  tidy)         tidy ;;
+  *)            exit 0 ;;
 esac
 
 exit $?
