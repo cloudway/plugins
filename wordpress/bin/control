@@ -54,6 +54,33 @@ function status {
     fi
 }
 
+function clean_snapshot {
+    rm -rf $CLOUDWAY_DATA_DIR/wordpress
+}
+
+function pre_dump {
+    mkdir -p $CLOUDWAY_DATA_DIR/wordpress
+    rm -rf $CLOUDWAY_DATA_DIR/wordpress/*
+    cp -p $CLOUDWAY_REPO_DIR/wp-config.php $CLOUDWAY_DATA_DIR/wordpress/
+    cp -Rp $CLOUDWAY_REPO_DIR/wp-content $CLOUDWAY_DATA_DIR/wordpress/
+}
+
+function post_dump {
+    clean_snapshot
+}
+
+function pre_restore {
+    clean_snapshot
+}
+
+function post_restore {
+    if [ -d $CLOUDWAY_DATA_DIR/wordpress ]; then
+        cp -Rpf $CLOUDWAY_DATA_DIR/wordpress/* $CLOUDWAY_REPO_DIR/
+        configure
+    fi
+    clean_snapshot
+}
+
 function configure {
     if ! [ -n "$CLOUDWAY_MYSQL_DB_HOST" -a -e ${CLOUDWAY_REPO_DIR}/wp-config.php ]; then
         return 0
@@ -149,13 +176,17 @@ function wait_for_stop {
 }
 
 case "$1" in
-    start)      echo "Starting WordPress";    start ;;
-    stop)       echo "Stopping WordPress";    stop ;;
-    restart)    echo "Restarting WordPress";  restart ;;
-    reload)     echo "Reloading WordPress";   reload ;;
-    status)     status ;;
-    tidy)       tidy ;;
-    *)          exit 0
+    start)        echo "Starting WordPress";    start ;;
+    stop)         echo "Stopping WordPress";    stop ;;
+    restart)      echo "Restarting WordPress";  restart ;;
+    reload)       echo "Reloading WordPress";   reload ;;
+    status)       status ;;
+    pre-dump)     pre_dump ;;
+    post-dump)    post_dump ;;
+    pre-restore)  pre_restore ;;
+    post-restore) post_restore ;;
+    tidy)         tidy ;;
+    *)            exit 0
 esac
 
 exit $?
