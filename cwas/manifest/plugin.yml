@@ -6,6 +6,8 @@ Vendor: cloudway
 Logo: manifest/logo.png
 Category: Framework
 Base-Image: icloudway/cwas:1.1
+Build-Cache:
+- .m2
 Endpoints:
 - Private-Host-Name: HOST
   Private-Port-Name: PORT

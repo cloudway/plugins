@@ -7,6 +7,8 @@ Vendor: Apache
 Logo: manifest/logo.png
 Category: Framework
 Base-Image: icloudway/tomcat:8.0
+Build-Cache:
+- .m2
 Endpoints:
 - Private-Host-Name: HOST
   Private-Port-Name: PORT
