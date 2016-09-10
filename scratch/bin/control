@@ -1,33 +1,30 @@
 #!/bin/bash
 set -e
 
-SUPERVISOR_CONF=${CLOUDWAY_SCRATCH_DIR}/etc/supervisor.conf
+pidfile=${CLOUDWAY_SCRATCH_DIR}/run/scratch.pid
+logfile=${CLOUDWAY_SCRATCH_LOG_DIR}/scratch.log
 
 function start() {
-    echo "Starting supervisor"
-    if ! $(pgrep -x supervisord > /dev/null 2>&1); then
-        supervisord -c $SUPERVISOR_CONF
-    fi
+      echo "Starting scratch"
+      cwctl daemon --pid-file=$pidfile --log-file=$logfile start $CLOUDWAY_REPO_DIR/bin/start
 }
 
 function stop() {
-    echo "Shutdown supervisor"
-    if $(pgrep -x supervisord > /dev/null 2>&1); then
-        supervisorctl -c $SUPERVISOR_CONF stop all
-        supervisorctl -c $SUPERVISOR_CONF shutdown
-    fi
+      echo "Shutdown scratch"
+      cwctl daemon --pid-file=$pidfile --log-file=$logfile stop
 }
 
 function restart() {
-    supervisorctl -c $SUPERVISOR_CONF restart all
+    stop
+    start
 }
 
 function reload() {
-    supervisorctl -c $SUPERVISOR_CONF reload
+    cwctl daemon --pid-file=$pidfile --log-file=$logfile reload
 }
 
 function status() {
-    supervisorctl -c $SUPERVISOR_CONF status
+    cwctl daemon --pid-file=$pidfile --log-file=$logfile status || true
 }
 
 case "$1" in

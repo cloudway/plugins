@@ -1,8 +1,8 @@
 ---
 Name: scratch
-Display-Name: Scratch 1.0
+Display-Name: Scratch 1.1
 Description: Run arbitrary application from scratch.
-Version: '1.0'
+Version: '1.1'
 Vendor: cloudway
 Logo: manifest/logo.png
 Category: Framework

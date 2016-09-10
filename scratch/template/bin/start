@@ -1,3 +1,5 @@
 #!/bin/bash -e
 
-exec $CLOUDWAY_REPO_DIR/bin/goserv
+# Replace this to start your application.
+cd $CLOUDWAY_REPO_DIR/www
+exec python -m http.server $CLOUDWAY_SCRATCH_PORT

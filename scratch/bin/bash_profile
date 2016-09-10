@@ -1,1 +1,0 @@
-alias supervisorctl='/usr/bin/supervisorctl -c $CLOUDWAY_SCRATCH_DIR/etc/supervisor.conf'
